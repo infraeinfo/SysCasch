@@ -6,6 +6,7 @@
 package tela;
 
 import funcao.BDconexao;
+import java.awt.HeadlessException;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,8 +43,8 @@ public class JFlogin extends javax.swing.JFrame {
         btregistrar = new javax.swing.JButton();
         btlogar = new javax.swing.JButton();
         btfechar = new javax.swing.JButton();
-        ctusuario = new javax.swing.JTextField();
-        cssenha = new javax.swing.JPasswordField();
+        txtLoguin = new javax.swing.JTextField();
+        txtSenha = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
@@ -82,23 +83,28 @@ public class JFlogin extends javax.swing.JFrame {
             }
         });
 
+        txtSenha.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtSenhaKeyReleased(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
                             .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(ctusuario)
-                            .addComponent(cssenha)))
+                            .addComponent(txtLoguin)
+                            .addComponent(txtSenha)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
                         .addComponent(btregistrar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btlogar, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -125,11 +131,11 @@ public class JFlogin extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(ctusuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtLoguin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(cssenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btregistrar)
@@ -158,19 +164,47 @@ public class JFlogin extends javax.swing.JFrame {
     }//GEN-LAST:event_btfecharActionPerformed
 
     private void btlogarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btlogarActionPerformed
+        logar();
+    }//GEN-LAST:event_btlogarActionPerformed
+
+    public void logar() throws HeadlessException {
+        con=null;//limpa spool de coenxoes
         try {
-            con = BDconexao.conecta("syscache");
+            con = BDconexao.conecta("syscash");
+            String query = "SELECT * FROM usuario WHERE login=? AND senha=?";
+            PreparedStatement pst = con.prepareStatement(query);
+            pst.setString(1,txtLoguin.getText());
+            pst.setString(2,txtSenha.getText());
+            pst.executeQuery();
+            ResultSet rs = pst.executeQuery();
+            
+            if(rs.next())//Se encontrou algun registro prossegue
+            {
+                funcao.Abre.telaPrincipal();
+                dispose();
+            }else{
+                txtLoguin.requestFocus();
+                JOptionPane.showMessageDialog(null,"Login ou Senha INVÁLIDOS!" +rs);
+            }
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Erro de SQL" + ex.getMessage());
+        }finally{
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(JFlogin.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        funcao.Abre.telaPrincipal();
-        dispose();
-
-    }//GEN-LAST:event_btlogarActionPerformed
+    }
 
     private void btregistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btregistrarActionPerformed
         funcao.Abre.reg_usuario();
     }//GEN-LAST:event_btregistrarActionPerformed
+
+    private void txtSenhaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSenhaKeyReleased
+       if(evt.getKeyChar()==evt.VK_ENTER)// prescionando a tecla enter
+           logar();
+    }//GEN-LAST:event_txtSenhaKeyReleased
 
     /**
      * @param args the command line arguments
@@ -211,12 +245,12 @@ public class JFlogin extends javax.swing.JFrame {
     private javax.swing.JButton btfechar;
     private javax.swing.JButton btlogar;
     private javax.swing.JButton btregistrar;
-    private javax.swing.JPasswordField cssenha;
-    private javax.swing.JTextField ctusuario;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JTextField txtLoguin;
+    private javax.swing.JPasswordField txtSenha;
     // End of variables declaration//GEN-END:variables
 }

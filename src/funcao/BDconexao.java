@@ -19,7 +19,7 @@ public class BDconexao {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             System.out.println("Driver OK!");
-            return DriverManager.getConnection("jdbc:mysql://127.0.0.1/"+nomeBD,"root","");
+            return DriverManager.getConnection("jdbc:mysql://localhost/"+nomeBD,"tads","tads123");
         } catch (ClassNotFoundException e) {
             throw new SQLException(e.getMessage());
         }
