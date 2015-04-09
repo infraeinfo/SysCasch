@@ -5,6 +5,12 @@
  */
 package tela;
 
+import funcao.BDconexao;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Rafael
@@ -17,7 +23,8 @@ public class JFlogin extends javax.swing.JFrame {
     public JFlogin() {
         initComponents();
     }
-
+    public Connection con;
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -151,13 +158,18 @@ public class JFlogin extends javax.swing.JFrame {
     }//GEN-LAST:event_btfecharActionPerformed
 
     private void btlogarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btlogarActionPerformed
-       funcao.Abre.telaPrincipal();
-       dispose();
-       
+        try {
+            con = BDconexao.conecta("syscache");
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, "Erro de SQL" + ex.getMessage());
+        }
+        funcao.Abre.telaPrincipal();
+        dispose();
+
     }//GEN-LAST:event_btlogarActionPerformed
 
     private void btregistrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btregistrarActionPerformed
-       funcao.Abre.reg_usuario();
+        funcao.Abre.reg_usuario();
     }//GEN-LAST:event_btregistrarActionPerformed
 
     /**
